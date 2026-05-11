@@ -1,0 +1,25 @@
+{
+  "name": "daily-diet-api-v2",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/marcel1712/daily-diet-api-v2#readme",
+  "bugs": {
+    "url": "https://github.com/marcel1712/daily-diet-api-v2/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcel1712/daily-diet-api-v2.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx tsx src/script.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0",
+    "typescript": "6.0.3"
+  }
+}
