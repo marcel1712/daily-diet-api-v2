@@ -1,9 +1,8 @@
 services:
-  database: 
+  database:
     restart: always
     image: "postgres:18-alpine3.23"
     env_file:
-      - ../.env.development 
+      - ../.env.development
     ports:
       - "5432:5432"
-    
