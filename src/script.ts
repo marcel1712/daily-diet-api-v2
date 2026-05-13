@@ -1,1 +1,1 @@
-console.log("test")
+const x = 1;
