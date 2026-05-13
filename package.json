@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "tsx": "^4.21.0",
-    "typescript": "6.0.3"
-  }
+    "typescript": "6.0.3",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
 }
