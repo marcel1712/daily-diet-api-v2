@@ -15,9 +15,12 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
+    "dev": "npx tsx src/script.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "typescript": "6.0.3"
-  }
+    "tsx": "^4.21.0",
+    "typescript": "6.0.3",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
 }
