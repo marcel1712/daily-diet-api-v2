@@ -15,17 +15,20 @@
   "author": "",
   "main": "index.js",
   "scripts": {
-    "dev": "npx tsx src/script.ts",
+    "dev": "npx tsx watch src/server.ts",
     "lint:prettier:check": "prettier --check .",
     "lint:prettier:fix": "prettier --write .",
     "lint:eslint:check": "npx eslint .",
     "knex": "knex --knexfile db/knexfile.ts",
     "services:down": "docker compose -f infra/compose.yaml down",
-    "services:up": "docker compose -f infra/compose.yaml up -d"
+    "services:up": "docker compose -f infra/compose.yaml up -d",
+    "test:watch": "npx vitest watch",
+    "test": "npx vitest run"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@types/node": "25.7.0",
+    "@types/supertest": "7.2.0",
     "eslint": "10.3.0",
     "globals": "^17.6.0",
     "prettier": "3.8.3",
@@ -36,6 +39,8 @@
     "vitest": "4.1.6"
   },
   "dependencies": {
+    "dotenv": "17.4.2",
+    "fastify": "5.8.5",
     "knex": "3.2.10",
     "pg": "8.20.0"
   }
