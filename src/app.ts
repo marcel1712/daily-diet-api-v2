@@ -1,11 +1,10 @@
-import dotenv from "dotenv";
 import Fastify from "fastify";
 import { knex } from "../db/database.ts";
 
 export const app = Fastify();
 
 const message = "VAI CORINTHIANS!!";
-app.get("/", async function handler(request, reply) {
+app.get("/", async function handler() {
   return message;
 });
 
