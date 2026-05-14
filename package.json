@@ -15,13 +15,15 @@
   "author": "",
   "main": "index.js",
   "scripts": {
-    "dev": "npx tsx src/script.ts",
+    "dev": "npx tsx watch src/server.ts",
     "lint:prettier:check": "prettier --check .",
     "lint:prettier:fix": "prettier --write .",
     "lint:eslint:check": "npx eslint .",
     "knex": "knex --knexfile db/knexfile.ts",
     "services:down": "docker compose -f infra/compose.yaml down",
-    "services:up": "docker compose -f infra/compose.yaml up -d"
+    "services:up": "docker compose -f infra/compose.yaml up -d",
+    "test:watch": "npx vitest watch",
+    "test": "npx vitest run"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
