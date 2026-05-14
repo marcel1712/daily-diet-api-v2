@@ -18,16 +18,23 @@
     "dev": "npx tsx src/script.ts",
     "lint:prettier:check": "prettier --check .",
     "lint:prettier:fix": "prettier --write .",
-    "lint:eslint:check": "npx eslint ."
+    "lint:eslint:check": "npx eslint .",
+    "knex": "knex --knexfile db/knexfile.ts",
+    "services:down": "docker compose -f infra/compose.yaml down",
+    "services:up": "docker compose -f infra/compose.yaml up -d"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@types/node": "^25.7.0",
-    "eslint": "^10.3.0",
+    "@eslint/js": "10.0.1",
+    "@types/node": "25.7.0",
+    "eslint": "10.3.0",
     "globals": "^17.6.0",
     "prettier": "3.8.3",
-    "tsx": "^4.21.0",
+    "tsx": "4.21.0",
     "typescript": "6.0.3",
-    "typescript-eslint": "^8.59.3"
+    "typescript-eslint": "8.59.3"
+  },
+  "dependencies": {
+    "knex": "3.2.10",
+    "pg": "8.20.0"
   }
 }
