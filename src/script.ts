@@ -1,1 +1,2 @@
-console.log("test");
+export const message = "test";
+console.log(message);
