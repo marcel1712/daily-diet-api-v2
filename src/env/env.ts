@@ -1,12 +1,18 @@
 import dotenv from "dotenv";
+import { z } from "zod";
+import { fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
 
-dotenv.config({ path: `${process.cwd()}/.env.development` });
+const __dirname = dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: resolve(__dirname, "../../.env.development") });
 
-export const env = {
-  POSTGRES_USER: process.env.POSTGRES_USER,
-  POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD,
-  POSTGRES_DB: process.env.POSTGRES_DB,
-  POSTGRES_HOST: process.env.POSTGRES_HOST,
-  POSTGRES_PORT: Number(process.env.POSTGRES_PORT),
-  POSTGRES_CLIENT: process.env.POSTGRES_CLIENT,
-};
+const envSchema = z.object({
+  POSTGRES_USER: z.string(),
+  POSTGRES_PASSWORD: z.string(),
+  POSTGRES_DB: z.string(),
+  POSTGRES_HOST: z.string(),
+  POSTGRES_PORT: z.coerce.number(),
+  POSTGRES_CLIENT: z.string().default("pg"),
+});
+
+export const env = envSchema.parse(process.env);
