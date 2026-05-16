@@ -1,7 +1,10 @@
 import z from "zod";
+import { uuid } from "zod";
 import type { FastifyRequest, FastifyReply } from "fastify";
+import passwordUtils from "./users.password.ts";
+import { knex } from "../../db/database.ts";
 
-async function create(request:FastifyRequest, reply:FastifyReply) {
+async function create(request: FastifyRequest, reply: FastifyReply) {
   const createUserBodySchema = z.object({
     username: z.string(),
     email: z.string().email(),
@@ -12,11 +15,22 @@ async function create(request:FastifyRequest, reply:FastifyReply) {
     request.body,
   );
 
-  return { username, email, password };
+  const hashedPassword = await passwordUtils.hash(password);
+
+  try {
+    const user = await knex("users").insert(
+      { username, email , password: hashedPassword },
+      ["user_id", "username", "email"],
+    );
+    return user[0];
+  } catch (err) {
+    console.error(err);
+    reply.status(500).send(err);
+  }
 }
 
 const UserController = {
-    create,
-}
+  create,
+};
 
 export default UserController;

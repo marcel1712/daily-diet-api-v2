@@ -1,9 +1,14 @@
-import { expect, test, beforeAll, afterAll } from "vitest";
+import { expect, test, beforeAll, afterAll, beforeEach } from "vitest";
 import { app } from "../../src/app.ts";
 import request from "supertest";
+import { knex } from "../../db/database.ts";
 
 beforeAll(async () => {
   await app.ready();
+});
+
+beforeEach(async () => {
+  await knex("users").delete();
 });
 
 afterAll(async () => {
@@ -14,7 +19,7 @@ test("POST /users returns", async () => {
   const response = await request(app.server)
     .post("/users")
     .send({
-      username: "Marcel Henrique Rodrigues Batista",
+      username: "marcelhrb",
       email: "marcel@email.com",
       password: "senhaBolada",
     })
@@ -24,8 +29,8 @@ test("POST /users returns", async () => {
 
   expect(response.status).toBe(200);
   expect(responseBody).toEqual({
-    username: "Marcel Henrique Rodrigues Batista",
+    username: "marcelhrb",
     email: "marcel@email.com",
-    password: "senhaBolada",
+    user_id: responseBody.user_id,
   });
 });
