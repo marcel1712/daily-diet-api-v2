@@ -9,3 +9,5 @@ export async function up(knex: Knex): Promise<void> {
     table.timestamps(true, true);
   });
 }
+
+export async function down(): Promise<void> {}

@@ -20,6 +20,7 @@
     "lint:prettier:fix": "prettier --write .",
     "lint:eslint:check": "npx eslint .",
     "knex": "knex --knexfile db/knexfile.ts",
+    "knex:migrate": "knex --knexfile db/knexfile.ts migrate:latest",
     "services:down": "docker compose -f infra/compose.yaml down",
     "services:up": "docker compose -f infra/compose.yaml up -d",
     "test:watch": "npx vitest watch",

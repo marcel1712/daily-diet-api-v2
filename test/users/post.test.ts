@@ -1,14 +1,12 @@
-import { expect, test, beforeAll, afterAll, beforeEach } from "vitest";
+import { expect, test, beforeAll, afterAll } from "vitest";
 import { app } from "../../src/app.ts";
 import request from "supertest";
 import { knex } from "../../db/database.ts";
 
 beforeAll(async () => {
-  await app.ready();
-});
-
-beforeEach(async () => {
   await knex("users").delete();
+  await app.ready();
+  await knex.migrate.latest();
 });
 
 afterAll(async () => {
