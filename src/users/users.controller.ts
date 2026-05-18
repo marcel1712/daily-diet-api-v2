@@ -3,6 +3,14 @@ import type { FastifyRequest, FastifyReply } from "fastify";
 import passwordUtils from "./users.password.ts";
 import { knex } from "../../db/database.ts";
 
+async function findOneByEmail(email: string) {
+  const user = await knex("users")
+    .select("user_id", "username", "email", "password")
+    .where({ email })
+    .first();
+  return user;
+}
+
 async function create(request: FastifyRequest, reply: FastifyReply) {
   const createUserBodySchema = z.object({
     username: z.string(),
@@ -37,6 +45,7 @@ async function create(request: FastifyRequest, reply: FastifyReply) {
 
 const UserController = {
   create,
+  findOneByEmail,
 };
 
 export default UserController;
