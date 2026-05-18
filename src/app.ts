@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import { knex } from "../db/database.ts";
+import { userRoutes } from "./users/users.routes.ts";
 
 export const app = Fastify();
 
@@ -7,6 +8,8 @@ const message = "VAI CORINTHIANS!!";
 app.get("/", async function handler() {
   return message;
 });
+
+app.register(userRoutes, { prefix: "users" });
 
 app.get("/status", async () => {
   const maxConnections = (await knex.raw("SHOW max_connections;")).rows[0]
