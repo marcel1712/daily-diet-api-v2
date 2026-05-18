@@ -38,7 +38,7 @@ async function create(request: FastifyRequest, reply: FastifyReply) {
   return reply.status(200).send({
     user_id: user.user_id,
     username: user.username,
-    email: user.email
+    email: user.email,
   });
 }
 

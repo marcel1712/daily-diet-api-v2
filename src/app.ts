@@ -14,10 +14,10 @@ app.get("/", async function handler() {
 
 app.register(cookie, {
   secret: env.COOKIE_SECRET,
-} as FastifyCookieOptions)
+} as FastifyCookieOptions);
 
 app.register(userRoutes, { prefix: "users" });
-app.register(sessionsRoutes, { prefix: "sessions"})
+app.register(sessionsRoutes, { prefix: "sessions" });
 
 app.get("/status", async () => {
   const maxConnections = (await knex.raw("SHOW max_connections;")).rows[0]

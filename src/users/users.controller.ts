@@ -7,8 +7,8 @@ async function findOneByEmail(email: string) {
   const user = await knex("users")
     .select("user_id", "username", "email", "password")
     .where({ email })
-    .first()
-  return user
+    .first();
+  return user;
 }
 
 async function create(request: FastifyRequest, reply: FastifyReply) {

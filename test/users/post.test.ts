@@ -1,4 +1,4 @@
-import { expect, test, beforeAll, afterAll, beforeEach} from "vitest";
+import { expect, test, beforeAll, afterAll, beforeEach } from "vitest";
 import { app } from "../../src/app.ts";
 import request from "supertest";
 import { knex } from "../../db/database.ts";
