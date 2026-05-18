@@ -13,6 +13,7 @@ const envSchema = z.object({
   POSTGRES_HOST: z.string(),
   POSTGRES_PORT: z.coerce.number(),
   POSTGRES_CLIENT: z.string().default("pg"),
+  COOKIE_SECRET: z.string(),
 });
 
 export const env = envSchema.parse(process.env);
