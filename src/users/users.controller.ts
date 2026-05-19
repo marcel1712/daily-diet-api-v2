@@ -2,23 +2,11 @@ import z from "zod";
 import type { FastifyRequest, FastifyReply } from "fastify";
 import passwordUtils from "./users.password.ts";
 import { knex } from "../../db/database.ts";
+import SessionController from "./sessions.controller.ts";
 
 async function verifyCookie(request: FastifyRequest) {
-  const verifyCookieSchema = z.object({
-    session_id: z.string(),
-  });
-
-  const { session_id } = verifyCookieSchema.parse(request.cookies);
-
-  //procurar no banco de dado se existe session_id e se ta atrelado a um usuario e se esta valida
-  const session = await knex("sessions")
-    .select("session_id", "user_id", "expires_at")
-    .where({ session_id })
-    .first();
-
-  if (!session || new Date(session.expires_at).getTime() < Date.now()) {
-    return null;
-  }
+  //verifica se ja ta tem um cookie no jar, se sim verifica se ele ta valido
+  const session = await SessionController.verifySession(request);
 
   const user = await knex("users")
     .select("user_id", "username")
@@ -72,10 +60,49 @@ async function create(request: FastifyRequest, reply: FastifyReply) {
   }
 }
 
+async function login(request: FastifyRequest, reply: FastifyReply) {
+  const loginUserBodySchema = z.object({
+    email: z.string().email(),
+    password: z.string(),
+  });
+
+  const { email, password } = loginUserBodySchema.parse(request.body);
+
+  const user = await findOneByEmail(email);
+
+  if (!user || !(await passwordUtils.compare(password, user.password))) {
+    return reply.status(401).send({ error: "Invalid credentials" });
+  }
+
+  await SessionController.pruneExpiredSessions(user.user_id);
+
+  const expiresAt = new Date(
+    Date.now() + SessionController.EXPIRATION_IN_MILISECONDS,
+  );
+
+  const [newSession] = await knex("sessions").insert(
+    { user_id: user.user_id, expires_at: expiresAt },
+    ["session_id"],
+  );
+
+  reply.setCookie("session_id", newSession.session_id, {
+    path: "/",
+    httpOnly: true,
+    expires: expiresAt,
+  });
+
+  return reply.status(200).send({
+    user_id: user.user_id,
+    username: user.username,
+    email: user.email,
+  });
+}
+
 const UserController = {
   create,
   findOneByEmail,
   verifyCookie,
+  login,
 };
 
 export default UserController;
