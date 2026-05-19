@@ -76,7 +76,9 @@ async function login(request: FastifyRequest, reply: FastifyReply) {
 
   await SessionController.pruneExpiredSessions(user.user_id);
 
-  const expiresAt = new Date(Date.now() + SessionController.EXPIRATION_IN_MILISECONDS);
+  const expiresAt = new Date(
+    Date.now() + SessionController.EXPIRATION_IN_MILISECONDS,
+  );
 
   const [newSession] = await knex("sessions").insert(
     { user_id: user.user_id, expires_at: expiresAt },

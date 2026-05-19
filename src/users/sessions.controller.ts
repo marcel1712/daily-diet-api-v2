@@ -65,7 +65,7 @@ async function pruneExpiredSessions(user_id: string) {
   await knex("sessions")
     .where({ user_id })
     .andWhere("expires_at", "<", new Date())
-    .delete()
+    .delete();
 }
 
 const SessionController = {
