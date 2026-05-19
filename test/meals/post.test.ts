@@ -48,4 +48,23 @@ test("POST /sessions returns", async () => {
   const cookies = responseSession.get("Set-Cookie");
 
   expect(cookies).toBeDefined();
+
+  const responseMeal = await request(app.server)
+    .post("/meals")
+    .set("Cookie", cookies!)
+    .send({
+      name: "Frango com arroz",
+      description: "Almoço pós-treino",
+      date: new Date().toISOString(),
+      is_on_diet: true,
+    });
+
+  const responseMealBody = responseMeal.body;
+
+  expect(responseMealBody).toEqual({
+    name: "Frango com arroz",
+    description: "Almoço pós-treino",
+    date: expect.any(String),
+    is_on_diet: true,
+  });
 });
