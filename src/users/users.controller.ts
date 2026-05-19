@@ -3,6 +3,35 @@ import type { FastifyRequest, FastifyReply } from "fastify";
 import passwordUtils from "./users.password.ts";
 import { knex } from "../../db/database.ts";
 
+async function verifyCookie(request: FastifyRequest) {
+  const verifyCookieSchema = z.object({
+    session_id: z.string(),
+  });
+
+  const { session_id } = verifyCookieSchema.parse(request.cookies);
+
+  //procurar no banco de dado se existe session_id e se ta atrelado a um usuario e se esta valida
+  const session = await knex("sessions")
+    .select("session_id", "user_id", "expires_at")
+    .where({ session_id })
+    .first();
+
+  if (!session || new Date(session.expires_at).getTime() < Date.now()) {
+    return null;
+  }
+
+  const user = await knex("users")
+    .select("user_id", "username")
+    .where({ user_id: session.user_id })
+    .first();
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return user;
+}
+
 async function findOneByEmail(email: string) {
   const user = await knex("users")
     .select("user_id", "username", "email", "password")
@@ -46,6 +75,7 @@ async function create(request: FastifyRequest, reply: FastifyReply) {
 const UserController = {
   create,
   findOneByEmail,
+  verifyCookie,
 };
 
 export default UserController;

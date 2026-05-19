@@ -2,6 +2,7 @@ import Fastify from "fastify";
 import { knex } from "../db/database.ts";
 import { userRoutes } from "./users/users.routes.ts";
 import { sessionsRoutes } from "./users/sessions.routes.ts";
+import { mealRoutes } from "./meals/meals.route.ts";
 import cookie, { type FastifyCookieOptions } from "@fastify/cookie";
 import { env } from "./env/env.ts";
 
@@ -18,6 +19,7 @@ app.register(cookie, {
 
 app.register(userRoutes, { prefix: "users" });
 app.register(sessionsRoutes, { prefix: "sessions" });
+app.register(mealRoutes, { prefix: "meals" });
 
 app.get("/status", async () => {
   const maxConnections = (await knex.raw("SHOW max_connections;")).rows[0]
