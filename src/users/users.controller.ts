@@ -3,6 +3,7 @@ import type { FastifyRequest, FastifyReply } from "fastify";
 import passwordUtils from "./users.password.ts";
 import { knex } from "../../db/database.ts";
 import SessionController from "./sessions.controller.ts";
+import MealController from "../meals/meals.controller.ts";
 
 async function verifyCookie(request: FastifyRequest) {
   //verifica se ja ta tem um cookie no jar, se sim verifica se ele ta valido
@@ -98,11 +99,56 @@ async function login(request: FastifyRequest, reply: FastifyReply) {
   });
 }
 
+async function getMetrics(request: FastifyRequest, reply: FastifyReply) {
+  const session = await SessionController.verifySession(request);
+
+  if (!session) {
+    return reply.status(401).send({ error: "Invalid session" });
+  }
+
+  const [{ count: totalRaw }] = (await knex("meals")
+    .where({ user_id: session.user_id })
+    .count("meal_id as count")) as [{ count: string }];
+
+  const [{ count: onDietRaw }] = (await knex("meals")
+    .where({ user_id: session.user_id, is_on_diet: true })
+    .count("meal_id as count")) as [{ count: string }];
+
+  const [{ count: offDietRaw }] = (await knex("meals")
+    .where({ user_id: session.user_id, is_on_diet: false })
+    .count("meal_id as count")) as [{ count: string }];
+
+  const meals = await MealController.getAllMeals(request, reply);
+
+  let best_streak = 0;
+  let current_streak = 0;
+
+  for (const meal of meals) {
+    if (meal.is_on_diet) {
+      current_streak++;
+      if (current_streak > best_streak) {
+        best_streak = current_streak;
+      }
+    } else {
+      current_streak = 0;
+    }
+  }
+
+  const metricsResults = {
+    total: Number(totalRaw),
+    on_diet: Number(onDietRaw),
+    off_diet: Number(offDietRaw),
+    best_streak,
+  };
+  return metricsResults;
+}
+
 const UserController = {
   create,
   findOneByEmail,
   verifyCookie,
   login,
+  getMetrics,
 };
 
 export default UserController;
