@@ -115,7 +115,7 @@ async function getAllMeals(request: FastifyRequest, reply: FastifyReply) {
     .select("meal_id", "name", "description", "date", "is_on_diet")
     .where({ user_id: session.user_id });
 
-  reply.status(200).send(meals);
+  return meals;
 }
 
 const MealController = {
