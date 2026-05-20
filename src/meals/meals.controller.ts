@@ -65,9 +65,28 @@ async function updateMeal(request: FastifyRequest, reply: FastifyReply) {
   reply.status(200).send(meal[0]);
 }
 
+async function deleteMeals(request: FastifyRequest, reply: FastifyReply) {
+  const deleteMealParamsSchema = z.object({
+    id: z.string(),
+  });
+
+  const session = await SessionController.verifySession(request);
+
+  if (!session) {
+    return reply.status(401).send({ error: "Invalid session" });
+  }
+
+  const { id } = deleteMealParamsSchema.parse(request.params);
+
+  await knex("meals").where({ meal_id: id, user_id: session.user_id }).delete();
+
+  reply.status(204).send();
+}
+
 const MealController = {
   create,
   updateMeal,
+  deleteMeals,
 };
 
 export default MealController;
