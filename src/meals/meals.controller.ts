@@ -2,6 +2,7 @@ import z from "zod";
 import { knex } from "../../db/database.ts";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import UserController from "../users/users.controller.ts";
+import SessionController from "../users/sessions.controller.ts";
 
 async function create(request: FastifyRequest, reply: FastifyReply) {
   const createMealBodySchema = z.object({
@@ -23,14 +24,50 @@ async function create(request: FastifyRequest, reply: FastifyReply) {
 
   const meal = await knex("meals").insert(
     { user_id: user.user_id, name, description, date, is_on_diet },
-    ["name", "description", "date", "is_on_diet", "name"],
+    ["meal_id", "name", "description", "date", "is_on_diet", "name"],
   );
 
   return meal[0];
 }
 
+async function updateMeal(request: FastifyRequest, reply: FastifyReply) {
+  const updateMealParamsSchema = z.object({
+    id: z.string(),
+  });
+
+  const createMealBodySchema = z.object({
+    name: z.string(),
+    description: z.string(),
+    date: z.coerce.date(),
+    is_on_diet: z.boolean(),
+  });
+
+  const session = await SessionController.verifySession(request);
+
+  if (!session) {
+    return reply.status(401).send({ error: "Invalid session" });
+  }
+
+  const { id } = updateMealParamsSchema.parse(request.params);
+  const { name, description, date, is_on_diet } = createMealBodySchema.parse(
+    request.body,
+  );
+
+  const meal = await knex("meals")
+    .update({ name, description, date, is_on_diet }, [
+      "meal_id",
+      "name",
+      "description",
+      "date",
+      "is_on_diet",
+    ])
+    .where({ meal_id: id, user_id: session.user_id });
+  reply.status(200).send(meal[0]);
+}
+
 const MealController = {
   create,
+  updateMeal,
 };
 
 export default MealController;

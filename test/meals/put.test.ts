@@ -16,7 +16,7 @@ afterAll(async () => {
   await app.close();
 });
 
-test("POST /sessions returns", async () => {
+test("PUT /meals/:id returns", async () => {
   const requestCreatedUser = await request(app.server)
     .post("/users")
     .send({
@@ -67,5 +67,23 @@ test("POST /sessions returns", async () => {
     description: "Almoço pós-treino",
     date: expect.any(String),
     is_on_diet: true,
+  });
+
+  const responseUpdatedMeal = await request(app.server)
+    .put(`/meals/${responseMealBody.meal_id}`)
+    .set("Cookie", cookies!)
+    .send({
+      name: "Frango",
+      description: "Almoço",
+      date: new Date().toISOString(),
+      is_on_diet: false,
+    });
+
+  expect(responseUpdatedMeal.body).toEqual({
+    meal_id: responseMealBody.meal_id,
+    name: "Frango",
+    description: "Almoço",
+    date: expect.any(String),
+    is_on_diet: false,
   });
 });
