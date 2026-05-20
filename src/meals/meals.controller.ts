@@ -78,11 +78,9 @@ async function deleteMeals(request: FastifyRequest, reply: FastifyReply) {
 
   const { id } = deleteMealParamsSchema.parse(request.params);
 
-  await knex("meals")
-    .where({ meal_id: id, user_id: session.user_id })
-    .delete();
+  await knex("meals").where({ meal_id: id, user_id: session.user_id }).delete();
 
-  reply.status(204).send()
+  reply.status(204).send();
 }
 
 const MealController = {
