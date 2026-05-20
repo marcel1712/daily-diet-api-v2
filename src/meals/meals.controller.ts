@@ -83,10 +83,47 @@ async function deleteMeals(request: FastifyRequest, reply: FastifyReply) {
   reply.status(204).send();
 }
 
+async function getMealById(request: FastifyRequest, reply: FastifyReply) {
+  const getMealParamsSchema = z.object({
+    id: z.string(),
+  });
+
+  const { id } = getMealParamsSchema.parse(request.params);
+
+  const session = await SessionController.verifySession(request);
+
+  if (!session) {
+    return reply.status(401).send({ error: "Invalid session" });
+  }
+
+  const meal = await knex("meals")
+    .select("meal_id", "name", "description", "date", "is_on_diet")
+    .where({ meal_id: id, user_id: session.user_id })
+    .first();
+
+  reply.status(200).send(meal);
+}
+
+async function getAllMeals(request: FastifyRequest, reply: FastifyReply) {
+  const session = await SessionController.verifySession(request);
+
+  if (!session) {
+    return reply.status(401).send({ error: "Invalid session" });
+  }
+
+  const meals = await knex("meals")
+    .select("meal_id", "name", "description", "date", "is_on_diet")
+    .where({ user_id: session.user_id });
+
+  reply.status(200).send(meals);
+}
+
 const MealController = {
   create,
   updateMeal,
   deleteMeals,
+  getMealById,
+  getAllMeals,
 };
 
 export default MealController;

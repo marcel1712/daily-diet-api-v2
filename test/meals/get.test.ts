@@ -16,7 +16,7 @@ afterAll(async () => {
   await app.close();
 });
 
-test("POST /meals returns", async () => {
+test("GET /meals returns", async () => {
   const requestCreatedUser = await request(app.server)
     .post("/users")
     .send({
@@ -49,7 +49,7 @@ test("POST /meals returns", async () => {
 
   expect(cookies).toBeDefined();
 
-  const responseMeal = await request(app.server)
+  const createdMealRequest = await request(app.server)
     .post("/meals")
     .set("Cookie", cookies!)
     .send({
@@ -59,10 +59,57 @@ test("POST /meals returns", async () => {
       is_on_diet: true,
     });
 
-  const responseMealBody = responseMeal.body;
+  const createdMeal = createdMealRequest.body;
 
-  expect(responseMealBody).toEqual({
-    meal_id: responseMealBody.meal_id,
+  const getMealRequest = await request(app.server)
+    .get(`/meals/${createdMeal.meal_id}`)
+    .set("Cookie", cookies!);
+
+  expect(getMealRequest.body).toEqual({
+    meal_id: createdMeal.meal_id,
+    name: "Frango com arroz",
+    description: "Almoço pós-treino",
+    date: expect.any(String),
+    is_on_diet: true,
+  });
+});
+
+test("GET /meals returns all meals from user", async () => {
+  await request(app.server).post("/users").send({
+    username: "marcelhrb",
+    email: "marcel@email.com",
+    password: "senhaBolada",
+  });
+
+  const responseSession = await request(app.server).post("/sessions").send({
+    email: "marcel@email.com",
+    password: "senhaBolada",
+  });
+
+  const cookies = responseSession.get("Set-Cookie");
+
+  await request(app.server).post("/meals").set("Cookie", cookies!).send({
+    name: "Frango com arroz",
+    description: "Almoço pós-treino",
+    date: new Date().toISOString(),
+    is_on_diet: true,
+  });
+
+  await request(app.server).post("/meals").set("Cookie", cookies!).send({
+    name: "Pizza",
+    description: "Jantar",
+    date: new Date().toISOString(),
+    is_on_diet: false,
+  });
+
+  const response = await request(app.server)
+    .get("/meals")
+    .set("Cookie", cookies!);
+
+  expect(response.status).toBe(200);
+  expect(response.body).toHaveLength(2);
+  expect(response.body[0]).toEqual({
+    meal_id: expect.any(String),
     name: "Frango com arroz",
     description: "Almoço pós-treino",
     date: expect.any(String),
