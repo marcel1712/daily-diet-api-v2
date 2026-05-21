@@ -42,25 +42,6 @@ async function create(request: FastifyRequest, reply: FastifyReply) {
   });
 }
 
-async function verifySession(request: FastifyRequest) {
-  const verifyCookieSchema = z.object({
-    session_id: z.string(),
-  });
-
-  const { session_id } = verifyCookieSchema.parse(request.cookies);
-
-  const session = await knex("sessions")
-    .select("session_id", "user_id", "expires_at")
-    .where({ session_id })
-    .first();
-
-  if (!session || new Date(session.expires_at).getTime() < Date.now()) {
-    return null;
-  }
-
-  return session;
-}
-
 async function pruneExpiredSessions(user_id: string) {
   await knex("sessions")
     .where({ user_id })
@@ -70,7 +51,6 @@ async function pruneExpiredSessions(user_id: string) {
 
 const SessionController = {
   create,
-  verifySession,
   pruneExpiredSessions,
   EXPIRATION_IN_MILISECONDS,
 };

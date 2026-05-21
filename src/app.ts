@@ -8,6 +8,8 @@ import { env } from "./env/env.ts";
 
 export const app = Fastify();
 
+app.decorateRequest("data", null);
+
 const message = "VAI CORINTHIANS!!";
 app.get("/", async function handler() {
   return message;
