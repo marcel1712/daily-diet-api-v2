@@ -1,27 +1,17 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import MealController from "./meals.controller.ts";
 import { checkSessionIdExists } from "../middleware/check-session-id.ts";
 
 export async function mealRoutes(app: FastifyInstance) {
-  app.post("/", { preHandler: [checkSessionIdExists] }, MealController.create);
-  app.put(
-    `/:id`,
-    { preHandler: [checkSessionIdExists] },
-    MealController.updateMeal,
+  app.addHook(
+    "preHandler",
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      await checkSessionIdExists(request, reply);
+    },
   );
-  app.delete(
-    `/:id`,
-    { preHandler: [checkSessionIdExists] },
-    MealController.deleteMeals,
-  );
-  app.get(
-    `/:id`,
-    { preHandler: [checkSessionIdExists] },
-    MealController.getMealById,
-  );
-  app.get(
-    `/`,
-    { preHandler: [checkSessionIdExists] },
-    MealController.getAllMeals,
-  );
+  app.post("/", MealController.create);
+  app.put(`/:id`, MealController.updateMeal);
+  app.delete(`/:id`, MealController.deleteMeals);
+  app.get(`/:id`, MealController.getMealById);
+  app.get(`/`, MealController.getAllMeals);
 }

@@ -1,4 +1,4 @@
-import type { FastifyRequest } from "fastify";
+import type { FastifyReply, FastifyRequest } from "fastify";
 import { knex } from "../../db/database.ts";
 import z from "zod";
 
@@ -10,12 +10,23 @@ declare module "fastify" {
   }
 }
 
-export async function checkSessionIdExists(request: FastifyRequest) {
+export async function checkSessionIdExists(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
   const verifyCookieSchema = z.object({
     session_id: z.string(),
   });
 
-  const { session_id } = verifyCookieSchema.parse(request.cookies);
+  const parsedCookies = verifyCookieSchema.safeParse(request.cookies);
+
+  if (!parsedCookies.success) {
+    return reply.status(401).send({
+      error: "Unauthorized",
+    });
+  }
+
+  const { session_id } = parsedCookies.data;
 
   const session = await knex("sessions")
     .select("session_id", "user_id", "expires_at")
@@ -23,7 +34,9 @@ export async function checkSessionIdExists(request: FastifyRequest) {
     .first();
 
   if (!session || new Date(session.expires_at).getTime() < Date.now()) {
-    return null;
+    return reply.status(401).send({
+      error: "Unauthorized",
+    });
   }
 
   const user = await knex("users")

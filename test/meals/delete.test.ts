@@ -9,6 +9,8 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  await knex("meals").delete();
+  await knex("sessions").delete();
   await knex("users").delete();
 });
 

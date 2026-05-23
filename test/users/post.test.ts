@@ -16,7 +16,7 @@ afterAll(async () => {
   await app.close();
 });
 
-test("POST /users returns", async () => {
+test("POST /users should create a user", async () => {
   const response = await request(app.server)
     .post("/users")
     .send({
@@ -26,12 +26,10 @@ test("POST /users returns", async () => {
     })
     .set("Accept", "application/json");
 
-  const responseBody = await response.body;
-
   expect(response.status).toBe(200);
-  expect(responseBody).toEqual({
+  expect(response.body).toEqual({
     username: "marcelhrb",
     email: "marcel@email.com",
-    user_id: responseBody.user_id,
+    user_id: expect.any(String),
   });
 });

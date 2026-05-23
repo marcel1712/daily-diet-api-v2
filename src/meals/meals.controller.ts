@@ -42,6 +42,15 @@ async function updateMeal(request: FastifyRequest, reply: FastifyReply) {
   );
   const { user_id } = request.data!;
 
+  const verifyMeal = await knex("meals")
+    .select("meal_id", "user_id")
+    .where({ meal_id: id })
+    .first();
+
+  if (verifyMeal.user_id != user_id) {
+    return reply.status(404).send();
+  }
+
   const meal = await knex("meals")
     .update({ name, description, date, is_on_diet }, [
       "meal_id",
@@ -50,7 +59,12 @@ async function updateMeal(request: FastifyRequest, reply: FastifyReply) {
       "date",
       "is_on_diet",
     ])
-    .where({ meal_id: id, user_id: user_id });
+    .where({ meal_id: id });
+
+  if (!meal.length) {
+    return reply.status(404).send();
+  }
+
   reply.status(200).send(meal[0]);
 }
 
