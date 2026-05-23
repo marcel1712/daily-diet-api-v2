@@ -18,13 +18,3 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(): Promise<void> {}
-
-/*
-meal_id — UUID, primary key
-user_id — UUID, foreign key referenciando users
-name — string, nome da refeição
-description — string, descrição
-date — timestamp, data e hora da refeição
-is_on_diet — boolean, se está dentro da dieta
-created_at e updated_at — timestamps automáticos
-*/

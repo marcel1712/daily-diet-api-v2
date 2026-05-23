@@ -9,6 +9,8 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  await knex("meals").delete();
+  await knex("sessions").delete();
   await knex("users").delete();
 });
 
@@ -68,4 +70,15 @@ test("POST /meals returns", async () => {
     date: expect.any(String),
     is_on_diet: true,
   });
+});
+
+test("POST /meals should not create a meal without authentication", async () => {
+  const responseMeal = await request(app.server).post("/meals").send({
+    name: "Frango com arroz",
+    description: "Almoço pós-treino",
+    date: "2026-05-22T12:00:00.000Z",
+    is_on_diet: true,
+  });
+
+  expect(responseMeal.status).toBe(401);
 });
